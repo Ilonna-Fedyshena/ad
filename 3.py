@@ -72,6 +72,11 @@ with col1:
     week_range = st.slider("Виберіть інтервал тижнів", 1, 52, key='week_range')
     year_range = st.slider("Виберіть інтервал років", 1997, 2025, key='year_range')
 
+    sort_asc = st.checkbox("Сортувати за зростанням", key="sort_asc")
+    sort_desc = st.checkbox("Сортувати за спаданням", key="sort_desc")
+
+    if sort_asc and sort_desc:
+        st.warning("Не можна одночасно обрати сортування за зростанням і спаданням!")
     if st.button("Скинути фільтри"):
         reset_filt()
 
@@ -79,6 +84,12 @@ with col2:
     filtered_data = df[(df['Year'].between(*st.session_state['year_range'])) &
                        (df['Week'].between(*st.session_state['week_range'])) &
                        (df['province_id'] == st.session_state['selected_province'])]
+    if sort_asc and not sort_desc:
+        filtered_data = filtered_data.sort_values(by=st.session_state['indicator'], ascending=True)
+    elif sort_desc and not sort_asc:
+        filtered_data = filtered_data.sort_values(by=st.session_state['indicator'], ascending=False)
+    elif sort_asc and sort_desc:
+        st.warning("Сортування не буде застосовано: обрані обидва типи сортування.")
 
     with tab1:
         st.write("Таблиця з відфільтрованими даними")
